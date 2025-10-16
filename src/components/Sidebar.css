@@ -1,0 +1,75 @@
+.sidebar {
+  width: 200px;
+  padding: 15px;
+  background-color: #1e2027;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100vh;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  cursor: pointer;
+  color: white; /* Letras en blanco */
+}
+
+.sidebar li img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-right: 8px;
+}
+
+.sidebar li span {
+  color: white;
+  font-weight: bold;
+}
+
+/* Línea justo después de T & C */
+.divider {
+  border: 0.5px solid #444;
+  margin: 5px 0 15px 0;
+}
+
+.recommendations h4 {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.recommendation-item img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.mini-stream-name {
+  color: white;
+  font-size: 14px;
+}
+
+/* Círculo morado para indicar "live" */
+.live-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #9b59b6;
+  margin-left: 6px;
+}
