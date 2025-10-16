@@ -1,4 +1,7 @@
+//se añadieron algunas cosas para el click rediriga al predeterminado del live
+
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // se añadio
 import "./Home.css";
 
 import stream1 from "../assets/stream1.jpg";
@@ -17,14 +20,12 @@ interface Stream {
   viewers: number;
   imagen: string;
 }
-
 // Rectángulo grande
 const featuredStreams: Stream[] = [
   { id: 1, titulo: "Stream Destacado 1", streamer: "Juan", viewers: 120, imagen: stream1 },
   { id: 2, titulo: "Stream Destacado 2", streamer: "Maria", viewers: 300, imagen: stream2 },
   { id: 3, titulo: "Stream Destacado 3", streamer: "Pedro", viewers: 150, imagen: stream3 },
 ];
-
 // Mini-streams
 const recomendados: Stream[] = [
   { id: 4, titulo: "Live 1", streamer: "Ana", viewers: 50, imagen: stream4 },
@@ -44,6 +45,12 @@ const juegos: Stream[] = [
 const Home: React.FC = () => {
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
+
+  const navigate = useNavigate();// se añadio
+  const irAlStream = () => navigate("/live/Alguien"); // se añadio
+
+
+
   const prevFeatured = () => {
     setFeaturedIndex((prev) => (prev === 0 ? featuredStreams.length - 1 : prev - 1));
   };
@@ -54,7 +61,17 @@ const Home: React.FC = () => {
 
   const renderMiniStreams = (streams: Stream[]) =>
     streams.map((s) => (
-      <div key={s.id} className="mini-stream-card">
+      <div
+        key={s.id}
+        className="mini-stream-card"
+
+
+
+        onClick={irAlStream} // se añadio
+        style={{ cursor: "pointer" }} // se añadio
+      >
+       
+       
         <img className="mini-stream-img" src={s.imagen} alt={s.titulo} />
         <img className="live-logo" src={liveIcon} alt="live" />
         <div className="mini-bottom">
@@ -69,8 +86,12 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container">
+
+
       {/* Rectángulo grande */}
-      <div className="featured-stream">
+      <div className="featured-stream" onClick={irAlStream} style={{ cursor: "pointer" }}> {/* se añadio*/}
+
+
         <img className="featured-img" src={featured.imagen} alt={featured.titulo} />
         <img className="live-logo" src={liveIcon} alt="live" />
         <div className="featured-bottom">
@@ -78,9 +99,9 @@ const Home: React.FC = () => {
           <span className="stream-title">{featured.titulo}</span>
         </div>
         <div className="featured-viewers">{featured.viewers} viewers</div>
-
-        <button className="carousel-arrow left" onClick={prevFeatured}>&lt;</button>
-        <button className="carousel-arrow right" onClick={nextFeatured}>&gt;</button>
+        
+        <button className="carousel-arrow left" onClick={(e) => { e.stopPropagation(); prevFeatured(); }}>&lt;</button>{/* para evitar que el boton rediriga a l link*/}
+        <button className="carousel-arrow right" onClick={(e) => { e.stopPropagation(); nextFeatured(); }}>&gt;</button>
       </div>
 
       {/* Secciones */}
