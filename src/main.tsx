@@ -1,13 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import App from './App.tsx'
+import './index.css'
+
+// la nueva pagina del stream
+import StreamPage from './pages/Stream/StreamPage'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Routes>
+        <Route path="/live/:channel" element={<StreamPage />} />
+        <Route path="/*" element={<App />} />
+      </Routes>
     </BrowserRouter>
-  </React.StrictMode>
-);
+  </React.StrictMode>,
+)
