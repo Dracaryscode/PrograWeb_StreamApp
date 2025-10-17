@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
-import lupa from "../assets/lupa.png";
 interface HeaderProps {
   onLogin: () => void;
   onRegister: () => void;
@@ -35,8 +35,17 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister }) => {
         />
       </div>
 
-      {/* Botones */}
-      <div className="header-buttons">
+        {/* Botones y enlaces */}
+      <div className="header-buttons flex gap-2 items-center">
+        {/* Enlace al Dashboard */}
+        <Link
+          to="/dashboard"
+          className="px-3 py-1 rounded-md text-sm font-semibold text-blue-600 hover:text-white hover:bg-blue-600 transition"
+        >
+          Dashboard
+        </Link>
+
+        {/* Botones originales */}
         <button onClick={onLogin} className="btn-login">Iniciar sesión</button>
         <button onClick={onRegister} className="btn-register">Registrarse</button>
       </div>

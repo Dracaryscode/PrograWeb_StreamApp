@@ -1,5 +1,6 @@
 const API = import.meta.env.VITE_API_URL; // ← puerta abierta
 
+void API; // prevent noUnusedLocals until used
 // MOCKS S8
 let gifts = [
   { id: crypto.randomUUID(), nombre: "Like Especial", costo: 0.5, puntos: 5 },

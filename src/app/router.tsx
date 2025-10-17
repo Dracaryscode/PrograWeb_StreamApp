@@ -9,6 +9,7 @@ import Login from "../pages/Login";           // crea una página simple que lla
 import Register from "../pages/Register";     // idem register
 import Feed from "../pages/Feed";             // placeholder
 import Gifts from "../pages/Gifts";           // CRUD usando api stubs
+import Dashboard from "../pages/Dashboard";
 
 export default function AppRouter() {
   return (
@@ -16,10 +17,11 @@ export default function AppRouter() {
       <BrowserRouter>
         <NavBar onLogin={()=>{}} onRegister={()=>{}} />
         <div style={{ display:"flex" }}>
-          <Sidebar onNavigate={() => {}} />
+          <Sidebar onNavigate={(_page: string) => {}} />
           <main className="mx-auto max-w-5xl px-4 flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/feed" element={<Feed />} />

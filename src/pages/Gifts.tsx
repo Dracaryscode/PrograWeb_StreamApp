@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
+import type { Gift } from "../types/gift";
 
 export default function Gifts() {
-  const [gifts, setGifts] = useState([]);
+  const [gifts, setGifts] = useState<Gift[]>([]);
   const [form, setForm] = useState({ nombre: "", costo: "", puntos: "" });
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function Gifts() {
 
   const handleDelete = async (id: string) => {
     await api.deleteGift(id);
-    setGifts(gifts.filter((g: any) => g.id !== id));
+    setGifts(gifts.filter((g) => g.id !== id));
   };
 
   return (
@@ -81,7 +82,7 @@ export default function Gifts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {gifts.map((g: any) => (
+              {gifts.map((g) => (
                 <tr key={g.id} className="hover:bg-gray-50 transition">
                   <td className="px-4 py-2">{g.nombre}</td>
                   <td className="px-4 py-2">${g.costo.toFixed(2)}</td>
