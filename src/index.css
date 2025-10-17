@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+/* Header general */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #14151B;
+  color: white;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* Logo */
+.header-logo img {
+  height: 55px;
+  object-fit: contain;
+}
+
+/* Saldo y nivel */
+.header-saldo {
+  margin: 0 15px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+/* Contenedor del buscador */
+.header-search-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* Input de búsqueda */
+.header-search {
+  width: 40%;
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+}
+
+/* Botones */
+.header-buttons button {
+  margin-left: 10px;
+  padding: 14px 30px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+/* Botón login */
+.btn-login {
+  background-color: #9f64ff;
+  color: #ffffff;
+  font-size: medium;
+}
+
+.btn-login:hover {
+  background-color: #8852cf;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Botón registrarse */
+.btn-register {
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  font-size: medium;
+}
+
+.btn-register:hover {
+  background-color: #555;
+  transform: scale(1.05);
+}
+
+.inicia-sesion{
+  color: white;
+  text-align: center;
+}
+
+
+.input-email,
+.input-contra {
+  background-color: transparent;
+  border: 1px solid #555; /* define color y grosor para todos los lados */
+  border-radius: 9px;
+  outline: none;           /* quita el borde azul al seleccionar */
+  color: white;            /* si quieres que la letra sea visible */
+  padding: 2px 10px; 
+  
+}
+
+.boton-ingresar{
+  background-color: #9f64ff;
+  padding: 2px 10px; 
+  border-radius: 14px;
+  outline: none;  
+  border: 1px solid #9f64ff; 
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  padding: 6px 7px;  
+  color: white;
+  font-weight: bold; 
+    
+}
+
+.boton-cerrar{
+  background-color: transparent;
+  padding: 2px 10px; 
+  border-radius: 14px;
+  outline: none;  
+  border: 1px solid #9f64ff; 
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  padding: 6px 7px;  
+  color:#9f64ff ;
+  font-weight: bold; 
+}
+
+.app {
+  background-color: #1A1B22; /* fondo oscuro principal */
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+/* Sidebar un poco más claro que la app */
+.sidebar {
+ /* más claro que el fondo general */
+  color: #4e4e4e;
+  width: 200px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+
+.boton-crear{
+  background-color: #9f64ff;
+  padding: 2px 10px; 
+  border-radius: 14px;
+  outline: none;  
+  border: 1px solid #9f64ff; 
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  padding: 6px 7px;  
+  color: white;
+  font-weight: bold; 
+    
+}
+
+.boton-cerrar2{
+  background-color: transparent;
+  padding: 2px 10px; 
+  border-radius: 14px;
+  outline: none;  
+  border: 1px solid #9f64ff; 
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  padding: 6px 7px;  
+  color:#9f64ff ;
+  font-weight: bold; 
+}
+
+
+
+.register-email2,
+.register-contra2, .register-nombre {
+  background-color: transparent;
+  border: 1px solid #555; /* define color y grosor para todos los lados */
+  border-radius: 9px;
+  outline: none;           /* quita el borde azul al seleccionar */
+  color: white;            /* si quieres que la letra sea visible */
+  padding: 2px 10px; 
+  
+}
+.register{
+   color: white;
+  text-align: center;
+}

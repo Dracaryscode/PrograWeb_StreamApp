@@ -1,0 +1,151 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: #020202;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+
+.modal {
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  background: #0b0b10;
+  color: #e6dff7; 
+  border-radius: 16px;
+  box-shadow: 0 8px 40px #020202;
+  border: 1px solid #2c1e44;
+  padding: 14px;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #b78eff;
+}
+.close {
+  background: transparent;
+  border: none;
+  color: #a381f9;
+  font-size: 22px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.close:hover {
+  color: #d3b9ff;
+}
+
+
+.subheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 12px;
+}
+.muted {
+  color: #a4a1b5;
+}
+.getKpoints {
+  background: #181126;
+  border: 1px solid #37255f;
+  color: #c59cff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.getKpoints:hover {
+  background: #24163f;
+  color: #ffffff;
+}
+
+
+.sectionTitle {
+  margin: 8px 0;
+  color: #a18df2;
+  font-weight: 700;
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+
+.giftCard {
+  background: #0f0a18;
+  border: 1px solid #392b57;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.giftCard:hover {
+  background: #1b1030;
+  transform: translateY(-2px);
+}
+
+
+.giftEmoji {
+  font-size: 40px;
+  line-height: 1;
+}
+.giftName {
+  font-weight: 700;
+  color: #e3d5ff;
+}
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #c8b8f6;
+}
+
+
+.k {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  background: #140c1f;
+  border: 1px solid #3c2e60;
+  border-radius: 6px;
+  color: #793bd0;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.balance {
+  position: sticky;
+  bottom: 0;
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid #2e1f4a;
+  color: #c9baff;
+}
+
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
