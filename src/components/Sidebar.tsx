@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import inicio from "../assets/inicio.png";
 import nosotros from "../assets/nosotros.png";
 import tienda from "../assets/tienda.png";
@@ -7,36 +8,35 @@ import perfilImg from "../assets/perfil.jpg"; // Imagen de perfil
 
 import "./Sidebar.css";
 
-interface SidebarProps {
-  onNavigate: (page: string) => void;
-}
-
 const recommendations = [
   { id: 1, name: "Canal 1", img: perfilImg, live: true },
   { id: 2, name: "Canal 2", img: perfilImg, live: false },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
+const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const goTo = (path: string) => navigate(path);
+
   return (
     <aside className="sidebar">
       <ul>
-        <li onClick={() => onNavigate("home")}>
+        <li onClick={() => goTo("/")}>
           <img src={inicio} alt="inicio" />
           <span>Inicio</span>
         </li>
-        <li onClick={() => onNavigate("perfil")}>
+        <li onClick={() => goTo("/perfil")}>
           <img src={inicio} alt="perfil" />
           <span>Perfil</span>
         </li>
-        <li onClick={() => onNavigate("tienda")}>
+        <li onClick={() => goTo("/tienda")}>
           <img src={tienda} alt="tienda" />
           <span>Tienda</span>
         </li>
-        <li onClick={() => onNavigate("nosotros")}>
+        <li onClick={() => goTo("/nosotros")}>
           <img src={nosotros} alt="nosotros" />
           <span>Nosotros</span>
         </li>
-        <li onClick={() => onNavigate("tyc")}>
+        <li onClick={() => goTo("/tyc")}>
           <img src={terminos} alt="tyc" />
           <span>T & C</span>
         </li>

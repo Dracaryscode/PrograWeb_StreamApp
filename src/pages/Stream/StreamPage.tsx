@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Header from '../../components/Header'
 import Sidebar from '../../components/Sidebar'
 import styles from './StreamPage.module.css'
@@ -15,14 +15,6 @@ type ChatMessage = {
 
 export default function StreamPage() {
   const { channel = 'channel' } = useParams()
-  const navigate = useNavigate()
-
- 
-  const onNavigate = (page: string) => {
-    
-    if (page === 'home' || page === 'inicio') navigate('/')
-    else navigate('/') 
-  }
 
   const openLogin = () => {}
   const openRegister = () => {}
@@ -62,7 +54,7 @@ export default function StreamPage() {
 
       <div className={styles.grid}>
         <aside className={styles.sideLeft}>
-          <Sidebar onNavigate={onNavigate} />
+          <Sidebar />
         </aside>
 
         <main className={styles.center}>

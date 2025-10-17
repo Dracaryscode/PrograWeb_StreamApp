@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../app/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -34,4 +34,3 @@ export default function Register() {
     </form>
   );
 }
-

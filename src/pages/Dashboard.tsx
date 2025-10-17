@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef } from "react";
 import { getSessions, totalHours, progressToNext, addSession } from "../services/stream";
 import OverlayNotification from "../components/OverlayNotification"; // Asegúrate de que la ruta es correcta
 import './Dashboard.css'; // Asegúrate de tener este archivo de estilos o crea uno

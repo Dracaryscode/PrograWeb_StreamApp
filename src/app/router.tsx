@@ -17,7 +17,7 @@ export default function AppRouter() {
       <BrowserRouter>
         <NavBar onLogin={()=>{}} onRegister={()=>{}} />
         <div style={{ display:"flex" }}>
-          <Sidebar onNavigate={(_page: string) => {}} />
+          <Sidebar />
           <main className="mx-auto max-w-5xl px-4 flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
