@@ -1,21 +1,26 @@
-import React from "react";
+import React from 'react';
+import './OverlayNotification.css'; // ¡Asegúrate de que esta línea exista!
 
-interface OverlayProps {
+interface OverlayNotificationProps {
   message: string;
   onClose: () => void;
 }
 
-const OverlayNotification: React.FC<OverlayProps> = ({ message, onClose }) => (
-  <div style={{
-    position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-    backgroundColor: "rgba(0,0,0,0.3)", display: "flex",
-    justifyContent: "center", alignItems: "center"
-  }}>
-    <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "5px" }}>
-      <p>{message}</p>
-      <button onClick={onClose}>Cerrar</button>
+const OverlayNotification: React.FC<OverlayNotificationProps> = ({ message, onClose }) => {
+  return (
+    // La capa exterior oscura que cierra la notificación al hacer clic
+    <div className="overlay-container" onClick={onClose}>
+      
+      {/* El contenido de la notificación (para evitar que se cierre al hacer clic adentro) */}
+      <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
+        <p>{message}</p>
+        <button onClick={onClose} className="overlay-close-btn">
+          Entendido
+        </button>
+      </div>
+
     </div>
-  </div>
-);
+  );
+};
 
 export default OverlayNotification;

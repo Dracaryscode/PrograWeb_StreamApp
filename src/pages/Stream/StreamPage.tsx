@@ -1,5 +1,3 @@
-// src/pages/StreamPage.tsx
-
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../../components/Header';
@@ -10,7 +8,7 @@ import perfil from '../../assets/perfil.jpg';
 import GiftShopModal, { type Gift } from './GiftShopModal';
 import GiftAlert from '../../components/GiftAlert';
 
-// --- Tus Tipos de Datos (con nivel añadido) ---
+// --- Tipos de Datos Combinados ---
 type ChatTextMessage = {
   id: string;
   type: 'text';
@@ -30,7 +28,7 @@ type AlertData = { user: string; gift: Gift; id: number };
 
 export default function StreamPage() {
   const { channel = 'channel' } = useParams();
-  const [user, setUser] = useState<any>({ name: 'Tu Nombre', role: 'streamer' });
+  const [user, setUser] = useState<any>({ name: 'Tu Nombre', role: 'streamer' }); // <--- Manejo de usuario
   const [input, setInput] = useState('');
   const [isGiftOpen, setGiftOpen] = useState(false);
   const [balance, setBalance] = useState(1000);
@@ -42,12 +40,9 @@ export default function StreamPage() {
     { id: crypto.randomUUID(), type: 'text', user: 'Maria_GG', badge: 'SUB', level: 25, text: 'Hola a todos! Lista para la partida 🔥' },
     { id: crypto.randomUUID(), type: 'text', user: 'NoobMaster69', level: 1, text: 'Hola, soy nuevo aquí, ¿de qué me perdí?' },
     { id: crypto.randomUUID(), type: 'text', user: 'DracarysCode', badge: 'MOD', level: 50, text: '¡Qué empiece la acción!' },
-    { id: crypto.randomUUID(), type: 'text', user: 'FanDeTiktok', level: 12, text: '¡Vamos por esa victoria! 💪' },
-    { id: crypto.randomUUID(), type: 'text', user: 'mateo', badge: 'SUB', level: 7, text: 'chau' },
-    { id: crypto.randomUUID(), type: 'text', user: 'mod_karen', badge: 'MOD', level: 50, text: 'Bienvenido al stream' },
-    { id: crypto.randomUUID(), type: 'text', user: 'juan123', level: 12, text: 'hola a todos' },
-    { id: crypto.randomUUID(), type: 'text', user: 'sub_pato', badge: 'SUB', level: 25, text: '¡Qué emoción!' },
   ]);
+  
+  // --- Sistema de Alertas de Regalos (de la versión entrante) ---
   const [alertQueue, setAlertQueue] = useState<AlertData[]>([]);
   const [currentAlert, setCurrentAlert] = useState<AlertData | null>(null);
 
@@ -62,10 +57,15 @@ export default function StreamPage() {
   }, [currentAlert, alertQueue]);
 
   const title = useMemo(() => `${channel} Live`, [channel]);
+  
+  // --- Lista de Regalos Completa (de tu versión) ---
   const gifts: Gift[] = [
     { id: 'Like', name: 'Like', price: 1, emoji: '👍' },
+    { id: 'gg', name: 'GG', price: 5, emoji: '🏁' },
     { id: 'hype', name: 'Hype', price: 10, emoji: '⚡' },
+    { id: 'Amor', name: 'Amor', price: 20, emoji: '💜' },
     { id: 'calavera', name: 'Calavera', price: 50, emoji: '💀' },
+    { id: 'algo', name: 'Ni Idea', price: 100, emoji: '🟢' },
   ];
 
   const onSend = () => {
@@ -117,19 +117,25 @@ export default function StreamPage() {
               <img src={fondoDirecto} alt="Fondo de stream" className={styles.player} />
           </div>
           <div className={styles.playerFooter}>
-             <div className={styles.playerActions}>
-                <button className={`${styles.btn} ${styles.btnFollow}`}>Seguir</button>
-                <button className={styles.btnPrimary} onClick={() => setGiftOpen(true)}>🎁 Regalos Puntos</button>
-                <button className={styles.btn}>Suscribirse</button>
-                <button className={styles.btnSubtle} onClick={() => setChatVisible(prev => !prev)}>
-                    {isChatVisible ? 'Ocultar Chat' : 'Mostrar Chat'}
-                </button>
-             </div>
-             <div className={styles.tabs}>
-                <button className={activeTab === 'about' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('about')}>Acerca de</button>
-                <button className={activeTab === 'recommended' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('recommended')}>Recomendado</button>
-                <button className={activeTab === 'clips' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('clips')}>Clips</button>
-             </div>
+             <div className={styles.streamMeta}>
+               <img src={perfil} alt="Avatar del canal" className={styles.avatar} />
+              <div>
+                <h1 className={styles.title}>{title}</h1>
+                <div className={styles.subtitle}>
+                  <span className={styles.livePill}>LIVE</span><span className={styles.dot} />
+                </div>
+              </div>
+            </div>
+            <div className={styles.playerActions}>
+              <button className={`${styles.btn} ${styles.btnFollow}`}>Seguir</button>
+              <button className={styles.btnPrimary} onClick={() => setGiftOpen(true)}>🎁 Regalos Puntos</button>
+              <button className={styles.btn}>Suscribirse</button>
+            </div>
+          </div>
+          <div className={styles.tabs}>
+            <button className={activeTab === 'about' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('about')}>Acerca de</button>
+            <button className={activeTab === 'recommended' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('recommended')}>Recomendado</button>
+            <button className={activeTab === 'clips' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('clips')}>Clips</button>
           </div>
           {activeTab === 'about' && (
               <div className={styles.aboutCard}>
@@ -137,20 +143,13 @@ export default function StreamPage() {
                   <p className={styles.aboutText}>Descripción del canal... se reemplazará con el backend más adelante.</p>
               </div>
           )}
-          <div className={styles.streamMeta}>
-             <img src={perfil} alt="Avatar del canal" className={styles.avatar} />
-            <div>
-              <h1 className={styles.title}>{title}</h1>
-              <div className={styles.subtitle}>
-                <span className={styles.livePill}>LIVE</span><span className={styles.dot} />
-              </div>
-            </div>
-          </div>
         </main>
         <aside className={`${styles.chat} ${!isChatVisible ? styles.chatHidden : ''}`}>
             <div className={styles.chatHeader}>
               <h4>Chat del Stream</h4>
-              <span className={styles.viewers}>125</span>
+              <button className={styles.btnSubtle} onClick={() => setChatVisible(prev => !prev)}>
+                  {isChatVisible ? 'Ocultar' : 'Mostrar'}
+              </button>
             </div>
             <div className={styles.messages} ref={listRef}>
               {messages.map(m => (
