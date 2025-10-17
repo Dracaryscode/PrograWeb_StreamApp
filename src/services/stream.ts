@@ -1,47 +1,87 @@
-// Estructura de una sesión de stream
-export type StreamSession = { start: number; end: number }; // timestamps ms
+// Define la estructura de una sesión de stream
+export interface StreamSession {
+    start: Date;
+    end: Date;
+}
 
-const KEY = "streamSessions";
+const SESSIONS_KEY = "stream_sessions_mock";
+// Ajusta los niveles según los requisitos de tu proyecto
+const LEVELS = [0, 5, 10, 20, 35, 50, 75, 100]; 
 
+// --- FUNCIONES PARA MANEJAR SESIONES ---
+
+/**
+ * Obtiene todas las sesiones del localStorage.
+ * Convierte las fechas guardadas como string de vuelta a objetos Date.
+ */
 export function getSessions(): StreamSession[] {
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
+    const data = localStorage.getItem(SESSIONS_KEY);
+    if (!data) return [];
+    
+    try {
+        // Es importante convertir las fechas de vuelta a objetos Date
+        return JSON.parse(data).map((s: any) => ({
+            start: new Date(s.start),
+            end: new Date(s.end),
+        }));
+    } catch {
+        return [];
+    }
 }
 
-export function setSessions(s: StreamSession[]) {
-  localStorage.setItem(KEY, JSON.stringify(s));
+/**
+ * Guarda un array de sesiones en el localStorage.
+ */
+export function setSessions(sessions: StreamSession[]): void {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
 }
 
-
-// Útil para pruebas mientras no tenemos el Req. 23:
-// Agrega una sesión mock de N horas hacia atrás.
-export function seedHoursIfEmpty(hours = 2) {
-  const sessions = getSessions();
-  if (sessions.length === 0) {
-    const now = Date.now();
-    const start = now - hours * 60 * 60 * 1000;
-    localStorage.setItem(KEY, JSON.stringify([{ start, end: now }]));
-  }
+/**
+ * Añade una nueva sesión a la lista existente en localStorage.
+ */
+export function addSession(newSession: StreamSession): void {
+    const sessions = getSessions();
+    sessions.push(newSession);
+    setSessions(sessions);
 }
 
-export function totalHours(sessions = getSessions()): number {
-  return sessions.reduce((acc, s) => acc + Math.max(0, (s.end - s.start)) / 36e5, 0);
+// --- FUNCIONES PARA CÁLCULOS ---
+
+/**
+ * Calcula el total de horas acumuladas de todas las sesiones.
+ */
+export function totalHours(sessions: StreamSession[]): number {
+    return sessions.reduce((acc, s) => {
+        const durationMs = s.end.getTime() - s.start.getTime();
+        // Convierte milisegundos a horas
+        return acc + durationMs / (1000 * 60 * 60);
+    }, 0);
 }
 
-// Niveles por horas (ajústalo a tu gusto)
-const LEVELS = [0, 5, 10, 20, 35, 50, 75, 100]; // límites inferiores
-export function levelFromHours(hours: number) {
-  let lvl = 1;
-  for (let i = 0; i < LEVELS.length; i++) {
-    if (hours >= LEVELS[i]) lvl = i + 1;
-  }
-  const next = LEVELS[Math.min(LEVELS.length, lvl)]; // objetivo del siguiente nivel
-  return { level: lvl, nextGoal: next ?? null };
-}
+/**
+ * Calcula el nivel actual del streamer y el progreso hacia el siguiente nivel.
+ */
+export function progressToNext(totalHours: number) {
+    let level = 1;
+    // Encuentra el nivel actual basado en las horas
+    for (let i = 0; i < LEVELS.length; i++) {
+        if (totalHours >= LEVELS[i]) {
+            level = i + 1;
+        }
+    }
 
-export function progressToNext(hours: number) {
-  const { level, nextGoal } = levelFromHours(hours);
-  const currBase = LEVELS[Math.max(0, level - 1)];
-  const goal = nextGoal ?? currBase;
-  const pct = goal === currBase ? 1 : Math.min(1, (hours - currBase) / (goal - currBase));
-  return { percent: pct, level, currBase, goal };
+    const currBase = LEVELS[level - 1] ?? 0;
+    const goal = LEVELS[level] ?? currBase; // El siguiente objetivo o el máximo si ya no hay más niveles
+
+    // Evita la división por cero si ya se alcanzó el nivel máximo
+    const range = goal - currBase;
+    const progress = totalHours - currBase;
+    const percent = range > 0 ? Math.min(progress / range, 1) : 1;
+
+    return { 
+        level: level, 
+        currBase: currBase, // Horas necesarias para el nivel actual
+        goal: goal,         // Horas necesarias para el siguiente nivel
+        percent: percent    // Porcentaje de progreso (0 a 1)
+    };
 }

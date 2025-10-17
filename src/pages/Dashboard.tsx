@@ -1,76 +1,100 @@
-import { useEffect, useMemo, useState } from "react";
-import { getSessions, seedHoursIfEmpty, totalHours, progressToNext } from "../services/stream";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { getSessions, totalHours, progressToNext, addSession } from "../services/stream";
+import OverlayNotification from "../components/OverlayNotification"; // Asegúrate de que la ruta es correcta
+import './Dashboard.css'; // Asegúrate de tener este archivo de estilos o crea uno
 
-export default function Dashboard() {
-  const [sessions, setSessions] = useState(() => getSessions());
+// --- INICIA EL CÓDIGO PARA COPIAR ---
 
-  useEffect(() => {
-    // Solo para que veas algo si no hay sesiones aún (quitar cuando implementes Req. 23)
-    seedHoursIfEmpty(2);
-    setSessions(getSessions());
-  }, []);
+const Dashboard = () => {
+    // --- ESTADO PARA LA LÓGICA DE DATOS ---
+    const [sessions, setSessions] = useState(() => getSessions());
 
-  const hours = useMemo(() => totalHours(sessions), [sessions]);
-  const prog = useMemo(() => progressToNext(hours), [hours]);
+    // --- ESTADO PARA LA LÓGICA DE INTERACCIÓN ---
+    const [isStreaming, setIsStreaming] = useState(false);
+    const [showLevelUp, setShowLevelUp] = useState(false);
+    const streamStartRef = useRef<Date | null>(null);
 
-  return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold">Dashboard de Horas</h1>
-      <p className="text-gray-600 mt-1">Resumen de tus transmisiones (mock en S8, sin backend).</p>
+    // --- CÁLCULOS DERIVADOS (MEMOIZED) ---
+    const hours = useMemo(() => totalHours(sessions), [sessions]);
+    const prog = useMemo(() => progressToNext(hours), [hours]);
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border p-4 bg-white">
-          <div className="text-sm text-gray-500">Horas totales</div>
-          <div className="text-4xl font-extrabold mt-1">{hours.toFixed(2)}h</div>
+    // --- MANEJADOR DEL BOTÓN DE STREAMING ---
+    const handleStreamToggle = () => {
+        const now = new Date();
+        if (isStreaming) {
+            // Deteniendo el stream
+            if (streamStartRef.current) {
+                // Añade la nueva sesión al mock de datos (localStorage)
+                addSession({ start: streamStartRef.current, end: now });
+                // Actualiza el estado para que la UI reaccione
+                setSessions(getSessions());
+            }
+        } else {
+            // Iniciando el stream
+            streamStartRef.current = now;
+        }
+        setIsStreaming(!isStreaming);
+    };
+
+    return (
+        <div className="dashboard-container">
+            <h1 className="dashboard-title">Dashboard del Streamer</h1>
+            <p className="dashboard-subtitle">Tu centro de control para monitorear tu progreso.</p>
+
+            {/* --- SECCIÓN DE BOTONES DE ACCIÓN --- */}
+            <div className="action-buttons">
+                <button onClick={handleStreamToggle} className={`stream-button ${isStreaming ? 'stop' : 'start'}`}>
+                    {isStreaming ? '🔴 Detener Transmisión' : '▶️ Iniciar Transmisión'}
+                </button>
+                <button onClick={() => setShowLevelUp(true)} className="simulate-button">
+                    Simular Subida de Nivel
+                </button>
+            </div>
+
+            {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="stat-label">Horas totales</div>
+                    <div className="stat-value">{hours.toFixed(2)}h</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-label">Nivel actual</div>
+                    <div className="stat-value">{prog.level}</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-label">Próximo objetivo</div>
+                    <div className="stat-value small">
+                        {prog.goal === prog.currBase ? "Máximo alcanzado" : `${prog.goal} h`}
+                    </div>
+                </div>
+            </div>
+
+            {/* --- BARRA DE PROGRESO --- */}
+            <div className="progress-card">
+                <div className="progress-labels">
+                    <span>{prog.currBase} h</span>
+                    <span>{prog.goal === prog.currBase ? `${hours.toFixed(2)} h` : `${prog.goal} h`}</span>
+                </div>
+                <div className="progress-bar-background">
+                    <div
+                        className="progress-bar-foreground"
+                        style={{ width: `${Math.round(prog.percent * 100)}%` }}
+                    />
+                </div>
+                <div className="progress-text">
+                    Progreso: <strong>{Math.round(prog.percent * 100)}%</strong>
+                </div>
+            </div>
+
+            {/* --- NOTIFICACIÓN OVERLAY (se muestra condicionalmente) --- */}
+            {showLevelUp && (
+                <OverlayNotification
+                    message={`¡Felicidades! Has alcanzado el nivel ${prog.level + 1}.`}
+                    onClose={() => setShowLevelUp(false)}
+                />
+            )}
         </div>
-        <div className="rounded-2xl border p-4 bg-white">
-          <div className="text-sm text-gray-500">Nivel actual</div>
-          <div className="text-4xl font-extrabold mt-1">{prog.level}</div>
-        </div>
-        <div className="rounded-2xl border p-4 bg-white">
-          <div className="text-sm text-gray-500">Próximo objetivo</div>
-          <div className="text-xl font-semibold mt-1">
-            {prog.goal === prog.currBase ? "Máximo alcanzado" : `${prog.goal} h`}
-          </div>
-        </div>
-      </div>
+    );
+};
 
-      {/* Barra de progreso hacia el siguiente nivel */}
-      <div className="mt-6 rounded-2xl border p-4 bg-white">
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <span>{prog.currBase} h</span>
-          <span>{prog.goal === prog.currBase ? `${hours.toFixed(2)} h` : `${prog.goal} h`}</span>
-        </div>
-        <div className="mt-2 h-3 w-full rounded-full bg-gray-200 overflow-hidden">
-          <div
-            className="h-full bg-blue-600"
-            style={{ width: `${Math.round(prog.percent * 100)}%` }}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(prog.percent * 100)}
-            role="progressbar"
-          />
-        </div>
-        <div className="mt-2 text-sm text-gray-700">
-          Progreso: <span className="font-semibold">{Math.round(prog.percent * 100)}%</span>
-        </div>
-      </div>
-
-      {/* Listado de sesiones (útil para depurar) */}
-      <div className="mt-6 rounded-2xl border p-4 bg-white">
-        <h2 className="font-semibold mb-2">Sesiones registradas</h2>
-        {sessions.length === 0 ? (
-          <p className="text-gray-500">No hay sesiones aún.</p>
-        ) : (
-          <ul className="space-y-1 text-sm">
-            {sessions.map((s, i) => (
-              <li key={i} className="text-gray-700">
-                {new Date(s.start).toLocaleString()} → {new Date(s.end).toLocaleString()}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
-  );
-}
+export default Dashboard;

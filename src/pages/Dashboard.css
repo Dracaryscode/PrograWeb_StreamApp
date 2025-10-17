@@ -1,0 +1,129 @@
+
+.dashboard-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f9fafb;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.stream-button, .simulate-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.stream-button.start {
+    background-color: #10b981;
+    color: white;
+}
+.stream-button.start:hover {
+    background-color: #059669;
+}
+
+.stream-button.stop {
+    background-color: #ef4444;
+    color: white;
+}
+.stream-button.stop:hover {
+    background-color: #dc2626;
+}
+
+.simulate-button {
+    background-color: #3b82f6;
+    color: white;
+}
+.simulate-button:hover {
+    background-color: #2563eb;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-top: 0.5rem;
+    color: #111827;
+}
+
+.stat-value.small {
+    font-size: 1.75rem;
+}
+
+.progress-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin-top: 2rem;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.progress-bar-background {
+    width: 100%;
+    background-color: #e5e7eb;
+    height: 0.75rem;
+    border-radius: 9999px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-bar-foreground {
+    height: 100%;
+    background-color: #3b82f6;
+    border-radius: 9999px;
+    transition: width 0.5s ease-in-out;
+}
+
+.progress-text {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #374151;
+}
