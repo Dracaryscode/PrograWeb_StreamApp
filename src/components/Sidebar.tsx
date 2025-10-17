@@ -4,8 +4,7 @@ import inicio from "../assets/inicio.png";
 import nosotros from "../assets/nosotros.png";
 import tienda from "../assets/tienda.png";
 import terminos from "../assets/terminos.png";
-import perfilImg from "../assets/perfil.jpg"; // Imagen de perfil
-
+import perfilImg from "../assets/perfil.jpg";
 import "./Sidebar.css";
 
 const recommendations = [
@@ -13,7 +12,12 @@ const recommendations = [
   { id: 2, name: "Canal 2", img: perfilImg, live: false },
 ];
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  user: any;
+  onLogout: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const goTo = (path: string) => navigate(path);
 
@@ -28,10 +32,15 @@ const Sidebar: React.FC = () => {
           <img src={inicio} alt="perfil" />
           <span>Perfil</span>
         </li>
-        <li onClick={() => goTo("/tienda")}>
-          <img src={tienda} alt="tienda" />
-          <span>Tienda</span>
-        </li>
+
+        {/* Mostrar Tienda solo si es usuario */}
+        {user?.role !== "streamer" && (
+          <li onClick={() => goTo("/tienda")}>
+            <img src={tienda} alt="tienda" />
+            <span>Tienda</span>
+          </li>
+        )}
+
         <li onClick={() => goTo("/nosotros")}>
           <img src={nosotros} alt="nosotros" />
           <span>Nosotros</span>
@@ -40,6 +49,15 @@ const Sidebar: React.FC = () => {
           <img src={terminos} alt="tyc" />
           <span>T & C</span>
         </li>
+
+        {user && (
+          <li
+            onClick={onLogout}
+            style={{ marginTop: "20px", cursor: "pointer", color: "#ff5757", fontWeight: "bold" }}
+          >
+            🚪 Cerrar sesión
+          </li>
+        )}
       </ul>
 
       <hr className="divider" />

@@ -1,87 +1,81 @@
-// Define la estructura de una sesión de stream
-export interface StreamSession {
-    start: Date;
-    end: Date;
-}
+// src/services/stream.ts
 
+// --- LÓGICA EXISTENTE DE SESIONES ---
+export interface StreamSession { start: Date; end: Date; }
 const SESSIONS_KEY = "stream_sessions_mock";
-// Ajusta los niveles según los requisitos de tu proyecto
-const LEVELS = [0, 5, 10, 20, 35, 50, 75, 100]; 
 
-// --- FUNCIONES PARA MANEJAR SESIONES ---
-
-/**
- * Obtiene todas las sesiones del localStorage.
- * Convierte las fechas guardadas como string de vuelta a objetos Date.
- */
 export function getSessions(): StreamSession[] {
     const data = localStorage.getItem(SESSIONS_KEY);
     if (!data) return [];
-    
     try {
-        // Es importante convertir las fechas de vuelta a objetos Date
         return JSON.parse(data).map((s: any) => ({
             start: new Date(s.start),
             end: new Date(s.end),
         }));
-    } catch {
-        return [];
-    }
+    } catch { return []; }
 }
 
-/**
- * Guarda un array de sesiones en el localStorage.
- */
 export function setSessions(sessions: StreamSession[]): void {
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
 }
 
-/**
- * Añade una nueva sesión a la lista existente en localStorage.
- */
 export function addSession(newSession: StreamSession): void {
     const sessions = getSessions();
     sessions.push(newSession);
     setSessions(sessions);
 }
 
-// --- FUNCIONES PARA CÁLCULOS ---
-
-/**
- * Calcula el total de horas acumuladas de todas las sesiones.
- */
 export function totalHours(sessions: StreamSession[]): number {
     return sessions.reduce((acc, s) => {
         const durationMs = s.end.getTime() - s.start.getTime();
-        // Convierte milisegundos a horas
-        return acc + durationMs / 1000;
+        return acc + durationMs / (1000 * 60 * 60);
     }, 0);
 }
 
-/**
- * Calcula el nivel actual del streamer y el progreso hacia el siguiente nivel.
- */
-export function progressToNext(totalSeconds: number) {//El parámetro ahora representará segundos para simular el caso
+// --- NUEVA LÓGICA PARA CONFIGURACIÓN DE NIVELES ---
+const LEVEL_CONFIG_KEY = "level_config_mock";
+
+const PRESETS = {
+  normal: [0, 100, 250, 500, 1000, 2000, 4000, 8000, 15000, 30000],
+  lenta: [0, 200, 500, 1200, 3000, 7000, 15000, 30000, 60000, 120000],
+  rapida: [0, 50, 120, 250, 500, 1000, 2000, 4000, 7500, 15000],
+};
+
+export function getLevelConfig(): number[] {
+  const data = localStorage.getItem(LEVEL_CONFIG_KEY);
+  return data ? JSON.parse(data) : PRESETS.normal;
+}
+
+export function saveLevelConfig(levels: number[]): void {
+  localStorage.setItem(LEVEL_CONFIG_KEY, JSON.stringify(levels));
+}
+
+export function getPreset(presetName: 'normal' | 'lenta' | 'rapida'): number[] {
+  return PRESETS[presetName];
+}
+
+// --- FUNCIÓN DE PROGRESO ACTUALIZADA ---
+export function progressToNext(totalHours: number) {
+    const totalPoints = totalHours * 100; // Asumimos 1h = 100 puntos
+    const LEVELS = getLevelConfig();
     let level = 1;
-    // Encuentra el nivel actual basado en las horas
     for (let i = 0; i < LEVELS.length; i++) {
-        if (totalSeconds >= LEVELS[i]) {
+        if (totalPoints >= LEVELS[i]) {
             level = i + 1;
-        }
+        } else { break; }
     }
 
     const currBase = LEVELS[level - 1] ?? 0;
-    const goal = LEVELS[level] ?? currBase; // El siguiente objetivo o el máximo si ya no hay más niveles
-
-    // Evita la división por cero si ya se alcanzó el nivel máximo
+    const goal = LEVELS[level] ?? currBase;
     const range = goal - currBase;
-    const progress = totalSeconds - currBase;
+    const progress = totalPoints - currBase;
     const percent = range > 0 ? Math.min(progress / range, 1) : 1;
 
     return { 
         level: level, 
-        currBase: currBase, // Horas necesarias para el nivel actual
-        goal: goal,         // Horas necesarias para el siguiente nivel
-        percent: percent    // Porcentaje de progreso (0 a 1)
+        currBase: currBase,
+        goal: goal,
+        percent: percent,
+        currentPoints: totalPoints
     };
 }
