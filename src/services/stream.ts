@@ -1,6 +1,4 @@
-// src/services/stream.ts
-
-// --- LÓGICA EXISTENTE DE SESIONES ---
+// --- LÓGICA DE SESIONES ---
 export interface StreamSession { start: Date; end: Date; }
 const SESSIONS_KEY = "stream_sessions_mock";
 
@@ -25,25 +23,19 @@ export function addSession(newSession: StreamSession): void {
     setSessions(sessions);
 }
 
-export function totalHours(sessions: StreamSession[]): number {
-    return sessions.reduce((acc, s) => {
-        const durationMs = s.end.getTime() - s.start.getTime();
-        return acc + durationMs / (1000 * 60 * 60);
-    }, 0);
-}
-
-// --- NUEVA LÓGICA PARA CONFIGURACIÓN DE NIVELES ---
+// --- LÓGICA PARA CONFIGURACIÓN DE NIVELES ---
 const LEVEL_CONFIG_KEY = "level_config_mock";
 
+// Los presets ahora definen las HORAS necesarias para cada nivel
 const PRESETS = {
-  normal: [0, 100, 250, 500, 1000, 2000, 4000, 8000, 15000, 30000],
-  lenta: [0, 200, 500, 1200, 3000, 7000, 15000, 30000, 60000, 120000],
-  rapida: [0, 50, 120, 250, 500, 1000, 2000, 4000, 7500, 15000],
+  normal: [0, 15, 45, 90, 150, 240, 360],
+  lenta: [0, 30, 90, 180, 300, 480, 720],
+  rapida: [0, 5, 15, 30, 60, 90, 120], // Ideal para la demo
 };
 
 export function getLevelConfig(): number[] {
   const data = localStorage.getItem(LEVEL_CONFIG_KEY);
-  return data ? JSON.parse(data) : PRESETS.normal;
+  return data ? JSON.parse(data) : PRESETS.rapida;
 }
 
 export function saveLevelConfig(levels: number[]): void {
@@ -54,28 +46,37 @@ export function getPreset(presetName: 'normal' | 'lenta' | 'rapida'): number[] {
   return PRESETS[presetName];
 }
 
-// --- FUNCIÓN DE PROGRESO ACTUALIZADA ---
-export function progressToNext(totalHours: number) {
-    const totalPoints = totalHours * 100; // Asumimos 1h = 100 puntos
+// --- FUNCIONES DE CÁLCULO ---
+
+// Devuelve el total de "horas simuladas" (1 segundo real = 1 hora simulada)
+export function totalHours(sessions: StreamSession[]): number {
+    return sessions.reduce((acc, s) => {
+        const durationMs = s.end.getTime() - s.start.getTime();
+        return acc + durationMs / 1000; // 1 segundo = 1 "hora"
+    }, 0);
+}
+
+// Calcula el progreso basado en el total de horas simuladas
+export function progressToNext(currentHours: number) {
     const LEVELS = getLevelConfig();
     let level = 1;
     for (let i = 0; i < LEVELS.length; i++) {
-        if (totalPoints >= LEVELS[i]) {
+        if (currentHours >= LEVELS[i]) {
             level = i + 1;
         } else { break; }
     }
 
-    const currBase = LEVELS[level - 1] ?? 0;
-    const goal = LEVELS[level] ?? currBase;
+    const currBase = LEVELS[level - 1] ?? 0; // Horas para el nivel actual
+    const goal = LEVELS[level] ?? currBase;   // Horas para el siguiente nivel
     const range = goal - currBase;
-    const progress = totalPoints - currBase;
+    const progress = currentHours - currBase;
     const percent = range > 0 ? Math.min(progress / range, 1) : 1;
 
     return { 
-        level: level, 
-        currBase: currBase,
-        goal: goal,
-        percent: percent,
-        currentPoints: totalPoints
+        level, 
+        currBase,
+        goal,
+        percent,
+        currentHours
     };
 }
