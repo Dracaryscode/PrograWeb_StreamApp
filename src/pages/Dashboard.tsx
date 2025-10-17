@@ -1,37 +1,64 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { getSessions, totalHours, progressToNext, addSession } from "../services/stream";
-import OverlayNotification from "../components/OverlayNotification"; // Asegúrate de que la ruta es correcta
-import './Dashboard.css'; // Asegúrate de tener este archivo de estilos o crea uno
-
-// --- INICIA EL CÓDIGO PARA COPIAR ---
+import OverlayNotification from "../components/OverlayNotification";
+import './Dashboard.css';
 
 const Dashboard = () => {
-    // --- ESTADO PARA LA LÓGICA DE DATOS ---
+    // Estado para las sesiones guardadas en localStorage
     const [sessions, setSessions] = useState(() => getSessions());
+    
+    // Estado para el tiempo total que se muestra en VIVO (representa "horas simuladas")
+    const [liveTime, setLiveTime] = useState(() => totalHours(sessions));
 
-    // --- ESTADO PARA LA LÓGICA DE INTERACCIÓN ---
+    // Estados de control
     const [isStreaming, setIsStreaming] = useState(false);
     const [showLevelUp, setShowLevelUp] = useState(false);
     const streamStartRef = useRef<Date | null>(null);
 
-    // --- CÁLCULOS DERIVADOS (MEMOIZED) ---
-    const hours = useMemo(() => totalHours(sessions), [sessions]);
-    const prog = useMemo(() => progressToNext(hours), [hours]);
+    // Los cálculos para la UI se basan en el tiempo EN VIVO
+    const prog = useMemo(() => progressToNext(liveTime), [liveTime]);
 
-    // --- MANEJADOR DEL BOTÓN DE STREAMING ---
+    // --- EFECTO PARA EL LOOP EN TIEMPO REAL ---
+    useEffect(() => {
+        let timer: number | undefined;
+
+        if (isStreaming && streamStartRef.current) {
+            const baseTime = totalHours(sessions);
+            const startTime = streamStartRef.current.getTime();
+
+            timer = setInterval(() => {
+                const now = new Date().getTime();
+                const currentStreamDuration = (now - startTime) / 1000;
+                
+                const newLiveTime = baseTime + currentStreamDuration;
+
+                const oldLevel = progressToNext(liveTime).level;
+                const newLevel = progressToNext(newLiveTime).level;
+
+                if (newLevel > oldLevel) {
+                    setShowLevelUp(true);
+                }
+                
+                setLiveTime(newLiveTime);
+            }, 1000);
+        }
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, [isStreaming, sessions, liveTime]);
+
+
     const handleStreamToggle = () => {
         const now = new Date();
         if (isStreaming) {
-            // Deteniendo el stream
             if (streamStartRef.current) {
-                // Añade la nueva sesión al mock de datos (localStorage)
                 addSession({ start: streamStartRef.current, end: now });
-                // Actualiza el estado para que la UI reaccione
                 setSessions(getSessions());
             }
         } else {
-            // Iniciando el stream
             streamStartRef.current = now;
+            setLiveTime(totalHours(sessions));
         }
         setIsStreaming(!isStreaming);
     };
@@ -41,39 +68,36 @@ const Dashboard = () => {
             <h1 className="dashboard-title">Dashboard del Streamer</h1>
             <p className="dashboard-subtitle">Tu centro de control para monitorear tu progreso.</p>
 
-            {/* --- SECCIÓN DE BOTONES DE ACCIÓN --- */}
             <div className="action-buttons">
                 <button onClick={handleStreamToggle} className={`stream-button ${isStreaming ? 'stop' : 'start'}`}>
                     {isStreaming ? '🔴 Detener Transmisión' : '▶️ Iniciar Transmisión'}
                 </button>
-                <button onClick={() => setShowLevelUp(true)} className="simulate-button">
-                    Simular Subida de Nivel
-                </button>
             </div>
 
-            {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
             <div className="stats-grid">
                 <div className="stat-card">
+                    {/* --- CAMBIO VISUAL --- */}
                     <div className="stat-label">Horas totales</div>
-                    <div className="stat-value">{hours.toFixed(2)}h</div>
+                    <div className="stat-value">{liveTime.toFixed(0)}h</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-label">Nivel actual</div>
                     <div className="stat-value">{prog.level}</div>
                 </div>
                 <div className="stat-card">
+                    {/* --- CAMBIO VISUAL --- */}
                     <div className="stat-label">Próximo objetivo</div>
                     <div className="stat-value small">
-                        {prog.goal === prog.currBase ? "Máximo alcanzado" : `${prog.goal} h`}
+                        {prog.goal === prog.currBase ? "Máximo" : `${prog.goal}h`}
                     </div>
                 </div>
             </div>
 
-            {/* --- BARRA DE PROGRESO --- */}
             <div className="progress-card">
                 <div className="progress-labels">
-                    <span>{prog.currBase} h</span>
-                    <span>{prog.goal === prog.currBase ? `${hours.toFixed(2)} h` : `${prog.goal} h`}</span>
+                    {/* --- CAMBIO VISUAL --- */}
+                    <span>{prog.currBase}h</span>
+                    <span>{prog.goal === prog.currBase ? `${liveTime.toFixed(0)}h` : `${prog.goal}h`}</span>
                 </div>
                 <div className="progress-bar-background">
                     <div
@@ -86,10 +110,9 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* --- NOTIFICACIÓN OVERLAY (se muestra condicionalmente) --- */}
             {showLevelUp && (
                 <OverlayNotification
-                    message={`¡Felicidades! Has alcanzado el nivel ${prog.level + 1}.`}
+                    message={`¡Felicidades! Has alcanzado el nivel ${prog.level}.`}
                     onClose={() => setShowLevelUp(false)}
                 />
             )}

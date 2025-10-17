@@ -54,18 +54,18 @@ export function totalHours(sessions: StreamSession[]): number {
     return sessions.reduce((acc, s) => {
         const durationMs = s.end.getTime() - s.start.getTime();
         // Convierte milisegundos a horas
-        return acc + durationMs / (1000 * 60 * 60);
+        return acc + durationMs / 1000;
     }, 0);
 }
 
 /**
  * Calcula el nivel actual del streamer y el progreso hacia el siguiente nivel.
  */
-export function progressToNext(totalHours: number) {
+export function progressToNext(totalSeconds: number) {//El parámetro ahora representará segundos para simular el caso
     let level = 1;
     // Encuentra el nivel actual basado en las horas
     for (let i = 0; i < LEVELS.length; i++) {
-        if (totalHours >= LEVELS[i]) {
+        if (totalSeconds >= LEVELS[i]) {
             level = i + 1;
         }
     }
@@ -75,7 +75,7 @@ export function progressToNext(totalHours: number) {
 
     // Evita la división por cero si ya se alcanzó el nivel máximo
     const range = goal - currBase;
-    const progress = totalHours - currBase;
+    const progress = totalSeconds - currBase;
     const percent = range > 0 ? Math.min(progress / range, 1) : 1;
 
     return { 
