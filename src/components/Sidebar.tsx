@@ -40,6 +40,13 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             <span>Tienda</span>
           </li>
         )}
+        {user?.role === "streamer" && (
+          <li onClick={() => goTo("/gifts")}>
+            {/* Puedes reusar la imagen de tienda o importar una nueva */}
+            <img src={tienda} alt="regalos" /> 
+            <span>Regalos</span>
+          </li>
+        )}
 
         <li onClick={() => goTo("/nosotros")}>
           <img src={nosotros} alt="nosotros" />
