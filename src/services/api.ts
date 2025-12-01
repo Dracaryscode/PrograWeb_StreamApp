@@ -11,10 +11,14 @@ export const api = {
   // Auth mock: guarda en localStorage
   async login(email: string, _password: string) {
     const role = email.includes("+s") ? "streamer" : "espectador";
-    const user = { email, role } as const;
+    const name = email.split("@")[0]; 
+    const user = { name, email, role } as const;
+    
     localStorage.setItem("user", JSON.stringify(user));
     return { token: "mock", user };
   },
+    
+  
   async register(email: string, _password: string) {
     return this.login(email, _password);
   },
@@ -26,5 +30,10 @@ export const api = {
     gifts = [item, ...gifts];
     return item;
   },
+  async updateGift(updatedGift: { id: string; nombre: string; costo: number; puntos: number }) {
+    gifts = gifts.map(g => g.id === updatedGift.id ? updatedGift : g);
+    return updatedGift;
+  },
   async deleteGift(id: string) { gifts = gifts.filter(x => x.id !== id); },
 };
+  
