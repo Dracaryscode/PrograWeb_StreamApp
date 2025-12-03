@@ -1,0 +1,50 @@
+/* src/components/OverlayNotification.css */
+
+.overlay-container {
+  /* Posicionamiento */
+  position: fixed; /* Se posiciona relativo a la ventana del navegador, no a un contenedor padre */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Ocupa todo el ancho de la ventana */
+  height: 100vh; /* Ocupa todo el alto de la ventana */
+  
+  /* La clave del problema: un z-index alto para estar por encima de todo */
+  z-index: 9999; 
+
+  /* Estilo y centrado */
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-content {
+  background-color: white;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+}
+
+.overlay-content p {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0 0 1.5rem 0;
+}
+
+.overlay-close-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.overlay-close-btn:hover {
+  background-color: #2563eb;
+}

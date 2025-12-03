@@ -1,0 +1,170 @@
+.home-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.featured-stream {
+  width: 95%;
+  max-width: 1300px;
+  height: 300px;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.featured-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+
+.featured-bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.perfil-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.stream-title {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 1px 1px 4px black;
+}
+
+.featured-viewers {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.5);
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+}
+
+.carousel-arrow {
+  position: absolute;
+  bottom: 20px;
+  font-size: 30px;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.carousel-arrow.left {
+  left: 50%;
+  transform: translateX(-60px);
+}
+
+.carousel-arrow.right {
+  right: 50%;
+  transform: translateX(60px);
+}
+
+.mini-section {
+  width: 95%;
+  max-width: 1300px;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  color: white;
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.section-divider {
+  width: 90%;
+  border: 0.5px solid #444;
+  margin: 20px 0;
+}
+
+.mini-streams {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.mini-stream-card {
+  width: 220px;
+  height: 124px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  background-color: #222;
+  flex-shrink: 0;
+}
+
+.mini-stream-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.live-logo {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 28px;
+  height: 28px;
+  z-index: 2;
+}
+
+.mini-bottom {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.mini-perfil-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+}
+
+.mini-stream-title {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px black;
+}
+
+.mini-viewers {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgba(0,0,0,0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}

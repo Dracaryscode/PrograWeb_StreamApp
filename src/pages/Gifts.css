@@ -1,0 +1,276 @@
+/* src/pages/Gifts.css */
+
+.gifts-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Encabezado */
+.gifts-header {
+  margin-bottom: 2rem;
+}
+
+.gifts-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(to right, #9f64ff, #d3b9ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gifts-subtitle {
+  color: #9ca3af;
+  margin-top: 0.5rem;
+}
+
+/* Formulario con efecto Glass */
+.glass-panel {
+  background: rgba(26, 27, 34, 0.95);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #333;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo decorativo de fondo */
+.glass-glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: #9f64ff;
+  opacity: 0.05;
+  filter: blur(50px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.panel-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #e6dff7;
+  position: relative;
+  z-index: 10;
+}
+
+.gifts-form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  align-items: end;
+  position: relative;
+  z-index: 10;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ajuste de columnas para el formulario */
+.col-name { grid-column: span 12; }
+.col-cost { grid-column: span 6; }
+.col-points { grid-column: span 6; }
+.col-actions { grid-column: span 12; display: flex; gap: 0.5rem; }
+
+@media (min-width: 768px) {
+  .col-name { grid-column: span 4; }
+  .col-cost { grid-column: span 3; }
+  .col-points { grid-column: span 3; }
+  .col-actions { grid-column: span 2; }
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.form-input {
+  width: 100%;
+  background-color: #0b0b10;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box; /* Importante para que no se desborde */
+}
+
+.form-input:focus {
+  border-color: #9f64ff;
+}
+
+.btn-primary, .btn-secondary {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-primary {
+  color: white;
+  background: linear-gradient(to right, #9f64ff, #7b2cbf);
+}
+.btn-primary:hover {
+  box-shadow: 0 0 15px rgba(159, 100, 255, 0.3);
+}
+
+.btn-primary.is-editing {
+  background: linear-gradient(to right, #10b981, #059669);
+}
+
+.btn-secondary {
+  background: #333;
+  color: white;
+}
+.btn-secondary:hover {
+  background: #444;
+}
+
+/* Grid de Tarjetas */
+.empty-state {
+  text-center: center;
+  padding: 5rem 0;
+  border: 2px dashed #333;
+  border-radius: 16px;
+  color: #6b7280;
+}
+
+.gifts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) { .gifts-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .gifts-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.gift-card {
+  background: #1A1B22;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 1.25rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.gift-card:hover {
+  border-color: #9f64ff;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.card-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.gift-card:hover .card-actions {
+  opacity: 1;
+}
+
+.icon-btn {
+  background: #2a2a35;
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.icon-btn:hover { background: #9f64ff; }
+.icon-btn.delete:hover { background: #ef4444; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.gift-icon-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: linear-gradient(135deg, #2c2c34, #111);
+  border: 1px solid #444;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.gift-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.gift-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: rgba(163, 129, 249, 0.15);
+  color: #a381f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  background: #0b0b10;
+  border: 1px solid #222;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stat {
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.divider-vertical {
+  background: #333;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: #6b7280;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
