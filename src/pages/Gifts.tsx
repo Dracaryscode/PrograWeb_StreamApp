@@ -1,66 +1,136 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../services/api";
 import type { Gift } from "../types/gift";
-import "./Gifts.css"; // ✨ IMPORTANTE: Importamos los estilos
+import "./Gifts.css";
+import { useAuth } from "../app/auth";
+
+type FormState = { nombre: string; costo_coins: string; puntos_otorgados: string; costo_usd: string; emoji: string };
 
 export default function Gifts() {
-  // --- 🧠 LÓGICA (SE MANTIENE IGUAL) ---
+  const { user, tokens } = useAuth();
+  const baseStreamerId = useMemo(
+    () => user?.perfilId ?? Number(import.meta.env.VITE_DEFAULT_STREAMER_ID ?? 0),
+    [user?.perfilId]
+  );
+  const [streamerId, setStreamerId] = useState<number | null>(baseStreamerId || null);
+
   const [gifts, setGifts] = useState<Gift[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ nombre: "", costo: "", puntos: "" });
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<FormState>({ nombre: "", costo_coins: "", puntos_otorgados: "", costo_usd: "", emoji: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Resolver streamerId si el perfil no lo trae
+  useEffect(() => {
+    const resolve = async () => {
+      if (streamerId) return;
+      if (user?.id) {
+        try {
+          const dash = await api.getStreamerDashboard(user.id, tokens?.accessToken);
+          if (dash?.id) setStreamerId(dash.id);
+        } catch {
+          setStreamerId(null);
+        }
+      }
+    };
+    resolve();
+  }, [streamerId, user?.id, tokens?.accessToken]);
 
   useEffect(() => {
-    api.getGifts().then(setGifts);
-  }, []);
+    const load = async () => {
+      if (!streamerId) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await api.listGifts(streamerId, tokens?.accessToken);
+        setGifts(data);
+      } catch (err: any) {
+        setError("No se pudieron cargar los regalos. Verifica el backend o las credenciales.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [streamerId, tokens?.accessToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const costoNum = parseFloat(form.costo);
-    const puntosNum = parseInt(form.puntos);
+    if (!streamerId) return;
+    const costoCoins = Number(form.costo_coins);
+    const puntos = Number(form.puntos_otorgados);
+    const costoUsd = form.costo_usd ? Number(form.costo_usd) : null;
+    if (!form.nombre || Number.isNaN(costoCoins) || Number.isNaN(puntos)) return;
 
-    if (!form.nombre || isNaN(costoNum) || isNaN(puntosNum)) return;
-
-    if (editingId) {
-      const giftActualizado = { id: editingId, nombre: form.nombre, costo: costoNum, puntos: puntosNum };
-      await api.updateGift(giftActualizado);
-      setGifts(gifts.map(g => g.id === editingId ? giftActualizado : g));
-      setEditingId(null);
-    } else {
-      const nuevo = { nombre: form.nombre, costo: costoNum, puntos: puntosNum };
-      const creado = await api.createGift(nuevo);
-      setGifts([...gifts, creado]);
+    setError(null);
+    try {
+      if (editingId) {
+        const updated = await api.updateGift(streamerId, editingId, {
+          nombre: form.nombre,
+          costo_usd: costoUsd,
+          costo_coins: costoCoins,
+          puntos_otorgados: puntos,
+          emoji: form.emoji || null,
+        }, tokens?.accessToken);
+        setGifts(gifts.map((g) => (g.id === editingId ? updated : g)));
+        setEditingId(null);
+      } else {
+        const created = await api.createGift(streamerId, {
+          nombre: form.nombre,
+          costo_usd: costoUsd,
+          costo_coins: costoCoins,
+          puntos_otorgados: puntos,
+          emoji: form.emoji || null,
+        }, tokens?.accessToken);
+        setGifts([created, ...gifts]);
+      }
+      setForm({ nombre: "", costo_coins: "", puntos_otorgados: "", costo_usd: "", emoji: "" });
+    } catch (err: any) {
+      setError("No se pudo guardar el regalo. Revisa la conexión o los datos.");
     }
-    setForm({ nombre: "", costo: "", puntos: "" });
   };
 
   const handleEdit = (gift: Gift) => {
     setEditingId(gift.id);
-    setForm({ nombre: gift.nombre, costo: gift.costo.toString(), puntos: gift.puntos.toString() });
+    setForm({
+      nombre: gift.nombre,
+      costo_coins: gift.costo_coins.toString(),
+      puntos_otorgados: gift.puntos_otorgados.toString(),
+      costo_usd: gift.costo_usd ? gift.costo_usd.toString() : "",
+      emoji: gift.emoji || "",
+    });
   };
 
   const handleCancel = () => {
     setEditingId(null);
-    setForm({ nombre: "", costo: "", puntos: "" });
+    setForm({ nombre: "", costo_coins: "", puntos_otorgados: "", costo_usd: "", emoji: "" });
   };
 
-  const handleDelete = async (id: string) => {
-    await api.deleteGift(id);
-    setGifts(gifts.filter((g) => g.id !== id));
+  const handleDelete = async (id: number) => {
+    if (!streamerId) return;
+    setError(null);
+    try {
+      await api.deleteGift(streamerId, id, tokens?.accessToken);
+      setGifts(gifts.filter((g) => g.id !== id));
+    } catch {
+      setError("No se pudo eliminar el regalo.");
+    }
   };
 
-  // --- 🎨 VISTA (Ahora usa las clases del CSS) ---
+  if (!user || user.role !== "streamer") {
+    return <div className="gifts-page">Inicia sesiA3n como streamer para administrar tus regalos.</div>;
+  }
+
   return (
     <div className="gifts-page">
       <div className="gifts-header">
-         <h1 className="gifts-title">🎁 Gestión de Regalos</h1>
-         <p className="gifts-subtitle">Administra los items de tu tienda para la comunidad.</p>
+         <h1 className="gifts-title">Gestion de Regalos</h1>
+         <p className="gifts-subtitle">Crea y edita los items que ver tu comunidad.</p>
       </div>
 
-      {/* Formulario */}
       <div className="glass-panel">
          <div className="glass-glow"></div>
          <h2 className="panel-title">
-            {editingId ? "✏️ Editando Regalo" : "✨ Crear Nuevo Regalo"}
+            {editingId ? "Editando Regalo" : "Crear Nuevo Regalo"}
          </h2>
 
          <form onSubmit={handleSubmit} className="gifts-form">
@@ -75,25 +145,47 @@ export default function Gifts() {
            </div>
            
            <div className="form-group col-cost">
-             <label className="form-label">Costo (USD)</label>
+             <label className="form-label">Costo (coins)</label>
+             <input
+               placeholder="0"
+               type="number"
+               step="1"
+               className="form-input"
+               value={form.costo_coins}
+               onChange={(e) => setForm({ ...form, costo_coins: e.target.value })}
+             />
+           </div>
+
+           <div className="form-group col-points">
+             <label className="form-label">Puntos otorgados</label>
+             <input
+               placeholder="0"
+               type="number"
+               className="form-input"
+               value={form.puntos_otorgados}
+               onChange={(e) => setForm({ ...form, puntos_otorgados: e.target.value })}
+             />
+           </div>
+
+           <div className="form-group col-points">
+             <label className="form-label">Costo USD (opcional)</label>
              <input
                placeholder="0.00"
                type="number"
                step="0.01"
                className="form-input"
-               value={form.costo}
-               onChange={(e) => setForm({ ...form, costo: e.target.value })}
+               value={form.costo_usd}
+               onChange={(e) => setForm({ ...form, costo_usd: e.target.value })}
              />
            </div>
 
-           <div className="form-group col-points">
-             <label className="form-label">Puntos</label>
+           <div className="form-group col-name">
+             <label className="form-label">Emoji (opcional)</label>
              <input
-               placeholder="0"
-               type="number"
+               placeholder="Ej: 🎁"
                className="form-input"
-               value={form.puntos}
-               onChange={(e) => setForm({ ...form, puntos: e.target.value })}
+               value={form.emoji}
+               onChange={(e) => setForm({ ...form, emoji: e.target.value })}
              />
            </div>
            
@@ -101,6 +193,7 @@ export default function Gifts() {
              <button
                type="submit"
                className={`btn-primary ${editingId ? 'is-editing' : ''}`}
+               disabled={loading}
              >
                {editingId ? "Guardar" : "Crear"}
              </button>
@@ -112,18 +205,19 @@ export default function Gifts() {
                  className="btn-secondary"
                  title="Cancelar"
                >
-                 ✕
+                 Cancelar
                </button>
              )}
            </div>
          </form>
+         {error && <div className="error-text">{error}</div>}
       </div>
 
-      {/* Grid de Regalos */}
-      {gifts.length === 0 ? (
+      {loading && <div className="empty-state">Cargando...</div>}
+      {!loading && gifts.length === 0 ? (
         <div className="empty-state">
-           <span style={{fontSize: "3rem", display: "block"}}>📦</span>
-           <p>Tu inventario está vacío.</p>
+           <span style={{fontSize: "3rem", display: "block"}}>✳</span>
+           <p>Aún no hay regalos creados.</p>
         </div>
       ) : (
         <div className="gifts-grid">
@@ -131,8 +225,8 @@ export default function Gifts() {
             <div key={g.id} className="gift-card">
                
                <div className="card-actions">
-                  <button onClick={() => handleEdit(g)} className="icon-btn" title="Editar">✏️</button>
-                  <button onClick={() => handleDelete(g.id)} className="icon-btn delete" title="Eliminar">🗑️</button>
+                  <button onClick={() => handleEdit(g)} className="icon-btn" title="Editar">✎</button>
+                  <button onClick={() => handleDelete(g.id)} className="icon-btn delete" title="Eliminar">🗑</button>
                </div>
 
                <div className="card-header">
@@ -145,14 +239,26 @@ export default function Gifts() {
                
                <div className="card-stats">
                   <div className="stat">
-                     <p className="stat-label">Costo USD</p>
-                     <p className="stat-value" style={{color: "#e6dff7"}}>${g.costo.toFixed(2)}</p>
+                     <p className="stat-label">Costo coins</p>
+                     <p className="stat-value" style={{color: "#e6dff7"}}>{g.costo_coins} coins</p>
                   </div>
                   <div className="divider-vertical"></div>
                   <div className="stat">
                      <p className="stat-label">Puntos</p>
-                     <p className="stat-value" style={{color: "#9f64ff"}}>{g.puntos} pts</p>
+                     <p className="stat-value" style={{color: "#9f64ff"}}>{g.puntos_otorgados} pts</p>
                   </div>
+                  {(() => {
+                    const usd = Number(g.costo_usd);
+                    return Number.isFinite(usd);
+                  })() && (
+                    <>
+                      <div className="divider-vertical"></div>
+                      <div className="stat">
+                        <p className="stat-label">Costo USD</p>
+                        <p className="stat-value" style={{color: "#e6dff7"}}>${Number(g.costo_usd).toFixed(2)}</p>
+                      </div>
+                    </>
+                  )}
                </div>
             </div>
           ))}

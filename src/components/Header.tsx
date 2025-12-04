@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import perfilImg from "../assets/perfil.jpg";
@@ -6,6 +6,8 @@ import perfilAlt1 from "../assets/Perfil/perfil1.png";
 import perfilAlt2 from "../assets/Perfil/perfil2.png";
 import notiImg from "../assets/noti.png";
 import LevelUpNotification from "./LevelUpNotification";
+import { api } from "../services/api";
+import { useAuth } from "../app/auth";
 
 interface HeaderProps {
   onLogin: () => void;
@@ -16,6 +18,10 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
   const [search, setSearch] = useState("");
   const [showNotif, setShowNotif] = useState(false);
+  const [viewerProgress, setViewerProgress] = useState<{ nivel: number; puntos: number; siguiente: number; falta: number; pct: number } | null>(null);
+  const [viewerSaldo, setViewerSaldo] = useState<number | null>(null);
+  const { tokens } = useAuth();
+
   const avatarMap = {
     perfil: perfilImg,
     perfil1: perfilAlt1,
@@ -23,16 +29,56 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
   };
   const avatarSrc = user ? avatarMap[user.avatarKey as keyof typeof avatarMap] ?? perfilImg : perfilImg;
 
-  // Datos simulados del Espectador
-  const nivel = 5;
-  const puntos = 230;
-  const puntosSiguienteNivel = 300;
-  const faltan = puntosSiguienteNivel - puntos;
-  const progreso = (puntos / puntosSiguienteNivel) * 100;
+  useEffect(() => {
+    let timeoutId: number | undefined;
+    const loadProgress = async () => {
+      const viewerId = (user?.perfilId ?? Number(import.meta.env.VITE_DEFAULT_VIEWER_ID ?? 0)) || null;
+
+      // Sin viewerId no podemos refrescar, pero no borramos lo último mostrado.
+      if (!viewerId) {
+        return;
+      }
+      try {
+        const [prog, saldo] = await Promise.allSettled([
+          api.getViewerProgreso(viewerId, tokens?.accessToken),
+          api.getViewerSaldo(viewerId, tokens?.accessToken),
+        ]);
+
+        if (prog.status === "fulfilled") {
+          const data = prog.value;
+          setViewerProgress({
+            nivel: data.nivel_actual,
+            puntos: data.puntos_actuales,
+            siguiente: data.siguiente_nivel ?? data.nivel_actual + 1,
+            falta: data.falta_puntos,
+            pct: data.progreso_porcentaje,
+          });
+        }
+
+        if (saldo.status === "fulfilled") {
+          setViewerSaldo(saldo.value.saldo_coins);
+        }
+      } catch {
+        // Mantén últimos valores si falla
+      } finally {
+        // reprograma un refresh ligero para evitar spam si el backend demora
+        clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(loadProgress, 15000);
+      }
+    };
+
+    loadProgress();
+    const onVisibility = () => { if (document.visibilityState === "visible") loadProgress(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [user?.perfilId, user?.role, tokens?.accessToken]);
 
   const getLevelUpMessage = () => {
     if (!user) return "";
-    if (user.role === "usuario") return "¡Subiste de nivel!"; // "usuario" o "espectador" según tu api
+    if (user.role === "espectador") return "¡Subiste de nivel!";
     if (user.role === "streamer") return "¡Subiste de nivel por horas de tu audiencia!";
     return "";
   };
@@ -45,15 +91,16 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
         </Link>
       </div>
 
-      {/* ✨ CORRECCIÓN: Esta barra ahora solo se muestra si NO es streamer (es decir, espectadores) */}
-      {user && user.role !== "streamer" && (
-        <div className="header-saldo" style={{ textAlign: "center", minWidth: "200px" }}>
-          <span style={{color: "#e6dff7", fontWeight: "bold"}}>
-             Nivel {nivel} ({puntos} pts)
+      {(viewerProgress || viewerSaldo !== null) && (
+        <div className="header-saldo" style={{ textAlign: "center", minWidth: "240px" }}>
+          <span style={{ color: "#e6dff7", fontWeight: "bold" }}>
+            Nivel {viewerProgress?.nivel ?? "-"} ({viewerProgress?.puntos ?? 0} pts)
           </span>
-          <div style={{ fontSize: "0.8rem", color: "#a381f9" }}>
-            Faltan {faltan} pts para el nivel {nivel + 1}
-          </div>
+          {viewerProgress && (
+            <div style={{ fontSize: "0.8rem", color: "#a381f9" }}>
+              Faltan {viewerProgress.falta} pts para el nivel {viewerProgress.siguiente}
+            </div>
+          )}
           <div
             style={{
               backgroundColor: "#333",
@@ -61,12 +108,12 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
               height: "6px",
               width: "100%",
               marginTop: "5px",
-              overflow: "hidden"
+              overflow: "hidden",
             }}
           >
             <div
               style={{
-                width: `${progreso}%`,
+                width: `${viewerProgress?.pct ?? 0}%`,
                 height: "100%",
                 backgroundColor: "#9f64ff",
                 borderRadius: "10px",
@@ -74,14 +121,18 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
               }}
             />
           </div>
+          {viewerSaldo !== null && (
+            <div style={{ marginTop: "6px", color: "#e6dff7", fontWeight: "bold" }}>
+              Monedas: {viewerSaldo} L
+            </div>
+          )}
         </div>
       )}
 
-      {/* Si es Streamer, quizás solo mostramos un saludo simple o nada */}
       {user?.role === "streamer" && (
-         <div className="header-saldo" style={{color: "#9f64ff", fontWeight: "bold"}}>
-            Modo Streamer 📡
-         </div>
+        <div className="header-saldo" style={{ color: "#9f64ff", fontWeight: "bold" }}>
+          Modo Streamer
+        </div>
       )}
 
       <div className="header-search-container">
@@ -103,44 +154,24 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
           </>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: "15px", position: "relative" }}>
-            
-            {/* Botones de acción Streamer */}
             {user.role === "streamer" && (
-              <>
-                <Link
-                  to="/dashboard"
-                  style={{ textDecoration: "none", color: "#a381f9", fontWeight: "bold", fontSize: "0.9rem" }}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  style={{
-                    backgroundColor: "#9f64ff",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "8px 16px",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    fontSize: "0.9rem"
-                  }}
-                >
-                  🎥 Go Live
-                </button>
-              </>
+              <Link
+                to="/dashboard"
+                style={{ textDecoration: "none", color: "#a381f9", fontWeight: "bold", fontSize: "0.9rem" }}
+              >
+                Dashboard
+              </Link>
             )}
 
-            {/* Perfil y Nombre */}
-            <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
-               <img
-                 src={avatarSrc}
-                 alt="Perfil"
-                 style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", border: "2px solid #9f64ff" }}
-               />
-               <span style={{ fontWeight: "bold", color: "white" }}>{user.name}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <img
+                src={avatarSrc}
+                alt="Perfil"
+                style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", border: "2px solid #9f64ff" }}
+              />
+              <span style={{ fontWeight: "bold", color: "white" }}>{user.name}</span>
             </div>
 
-            {/* Notificaciones */}
             <button
               onClick={() => setShowNotif(!showNotif)}
               style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
