@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ onLogin, onRegister, user }) => {
         </Link>
       </div>
 
-      {(viewerProgress || viewerSaldo !== null) && (
+      {user?.role !== "streamer" && (viewerProgress || viewerSaldo !== null) && (
         <div className="header-saldo" style={{ textAlign: "center", minWidth: "240px" }}>
           <span style={{ color: "#e6dff7", fontWeight: "bold" }}>
             Nivel {viewerProgress?.nivel ?? "-"} ({viewerProgress?.puntos ?? 0} pts)
