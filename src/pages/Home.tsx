@@ -1,128 +1,158 @@
-//se añadieron algunas cosas para el click rediriga al predeterminado del live
-
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // se añadio
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
-
-import stream1 from "../assets/stream1.jpg";
-import stream2 from "../assets/stream2.jpg";
-import stream3 from "../assets/stream3.jpg";
-import stream4 from "../assets/stream2.jpg";
-import stream5 from "../assets/stream1.jpg";
-import stream6 from "../assets/stream2.jpg";
-import perfil from "../assets/perfil.jpg";
 import liveIcon from "../assets/live.png";
+import perfil from "../assets/perfil.jpg";
+import fallbackStreamImg from "../assets/stream1.jpg";
+import { request } from "../services/http";
 
-interface Stream {
+type Stream = {
   id: number;
   titulo: string;
   streamer: string;
+  estado?: string;
   viewers: number;
-  imagen: string;
-}
-// Rectángulo grande
-const featuredStreams: Stream[] = [
-  { id: 1, titulo: "Stream Destacado 1", streamer: "Juan", viewers: 120, imagen: stream1 },
-  { id: 2, titulo: "Stream Destacado 2", streamer: "Maria", viewers: 300, imagen: stream2 },
-  { id: 3, titulo: "Stream Destacado 3", streamer: "Pedro", viewers: 150, imagen: stream3 },
-];
-// Mini-streams
-const recomendados: Stream[] = [
-  { id: 4, titulo: "Live 1", streamer: "Ana", viewers: 50, imagen: stream4 },
-  { id: 5, titulo: "Live 2", streamer: "Luis", viewers: 70, imagen: stream5 },
-  { id: 6, titulo: "Live 3", streamer: "Carlos", viewers: 100, imagen: stream6 },
-];
-
-const conversando: Stream[] = [
-  { id: 7, titulo: "Chat con fans", streamer: "Ana", viewers: 50, imagen: stream4 },
-  { id: 8, titulo: "Hablando de juegos", streamer: "Luis", viewers: 70, imagen: stream5 },
-];
-
-const juegos: Stream[] = [
-  { id: 9, titulo: "Partida épica", streamer: "Carlos", viewers: 200, imagen: stream6 },
-];
+  imagen: string | null;
+  room?: string | null;
+  streamerId?: number | null;
+};
 
 const Home: React.FC = () => {
+  const [featured, setFeatured] = useState<Stream[]>([]);
+  const [recomendados, setRecomendados] = useState<Stream[]>([]);
+  const [conversando, setConversando] = useState<Stream[]>([]);
+  const [juegos, setJuegos] = useState<Stream[]>([]);
   const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const loadStreams = async () => {
+      setLoading(true);
+      try {
+        const endpoint = import.meta.env.VITE_HOME_STREAMS_ENDPOINT || "/api/streams";
+        const data = await request<Stream[]>(endpoint);
+        const liveOnly = data
+          .filter((d: any) => !d.estado || d.estado === "en_vivo")
+          .map((d: any) => ({
+            ...d,
+            streamerId: d.streamer_id ?? d.streamerId ?? null,
+            room: d.room ?? d.canal_slug ?? null,
+          }));
+        const setSection = (list: Stream[]) => {
+          setFeatured(list.slice(0, 1));
+          setRecomendados(list.slice(1, 5));
+          setConversando(list.slice(5, 9));
+          setJuegos(list.slice(9, 13));
+        };
+        setSection(liveOnly);
+      } catch {
+        setFeatured([]);
+        setRecomendados([]);
+        setConversando([]);
+        setJuegos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStreams();
+  }, []);
 
-  const navigate = useNavigate();// se añadio
-  const irAlStream = () => navigate("/live/Alguien"); // se añadio
-
-
+  const irAlStream = (channel?: string) => navigate(`/live/${channel ?? "canal"}`);
+  const irAVer = (stream: Stream) => {
+    // Usar el mismo esquema de room/scene que stream-setup y VDO Ninja
+    const room = `stream${stream.id}`;
+    const scene = encodeURIComponent(`https://vdo.ninja/?scene&room=${room}`);
+    const streamerParam = stream.streamerId ? `&streamerId=${stream.streamerId}` : "";
+    navigate(`/watch/${room}?streamId=${stream.id}&scene=${scene}${streamerParam}`);
+  };
 
   const prevFeatured = () => {
-    setFeaturedIndex((prev) => (prev === 0 ? featuredStreams.length - 1 : prev - 1));
+    setFeaturedIndex((prev) => (prev === 0 ? Math.max(featured.length - 1, 0) : prev - 1));
   };
 
   const nextFeatured = () => {
-    setFeaturedIndex((prev) => (prev === featuredStreams.length - 1 ? 0 : prev + 1));
+    setFeaturedIndex((prev) => (prev === featured.length - 1 ? 0 : prev + 1));
   };
 
-  const renderMiniStreams = (streams: Stream[]) =>
-    streams.map((s) => (
+  const renderMiniStreams = (streams: Stream[]) => {
+    if (!streams.length) {
+      return <div className="empty-streams">Sin streams: conecta el backend para poblar esta secciA3n.</div>;
+    }
+    return streams.map((s) => (
       <div
         key={s.id}
         className="mini-stream-card"
-
-
-
-        onClick={irAlStream} // se añadio
-        style={{ cursor: "pointer" }} // se añadio
+        onClick={() => irAVer(s)}
+        style={{ cursor: "pointer" }}
       >
-       
-       
-        <img className="mini-stream-img" src={s.imagen} alt={s.titulo} />
+        <img className="mini-stream-img" src={s.imagen || fallbackStreamImg} alt={s.titulo} />
         <img className="live-logo" src={liveIcon} alt="live" />
         <div className="mini-bottom">
           <img className="mini-perfil-logo" src={perfil} alt="perfil" />
           <span className="mini-stream-title">{s.titulo}</span>
         </div>
-        <div className="mini-viewers">{s.viewers} viewers</div>
+        <div className="mini-viewers">{s.viewers ?? 0} viewers</div>
       </div>
     ));
+  };
 
-  const featured = featuredStreams[featuredIndex];
+  const featuredStream = featured[featuredIndex];
 
   return (
     <div className="home-container">
+      {loading && <div className="empty-featured">Cargando streams en vivo...</div>}
+      {!loading && featuredStream ? (
+        <div
+          className="featured-stream"
+          onClick={() => irAVer(featuredStream)}
+          style={{ cursor: "pointer" }}
+        >
+          <img className="featured-img" src={featuredStream.imagen || fallbackStreamImg} alt={featuredStream.titulo} />
+          <img className="live-logo" src={liveIcon} alt="live" />
+          <div className="featured-bottom">
+            <img className="perfil-logo" src={perfil} alt="perfil" />
+            <span className="stream-title">{featuredStream.titulo}</span>
+          </div>
+          <div className="featured-viewers">{featuredStream.viewers ?? 0} viewers</div>
 
-
-      {/* Rectángulo grande */}
-      <div className="featured-stream" onClick={irAlStream} style={{ cursor: "pointer" }}> {/* se añadio*/}
-
-
-        <img className="featured-img" src={featured.imagen} alt={featured.titulo} />
-        <img className="live-logo" src={liveIcon} alt="live" />
-        <div className="featured-bottom">
-          <img className="perfil-logo" src={perfil} alt="perfil" />
-          <span className="stream-title">{featured.titulo}</span>
+          {featured.length > 1 && (
+            <>
+              <button className="carousel-arrow left" onClick={(e) => { e.stopPropagation(); prevFeatured(); }}>&lt;</button>
+              <button className="carousel-arrow right" onClick={(e) => { e.stopPropagation(); nextFeatured(); }}>&gt;</button>
+            </>
+          )}
         </div>
-        <div className="featured-viewers">{featured.viewers} viewers</div>
-        
-        <button className="carousel-arrow left" onClick={(e) => { e.stopPropagation(); prevFeatured(); }}>&lt;</button>{/* para evitar que el boton rediriga a l link*/}
-        <button className="carousel-arrow right" onClick={(e) => { e.stopPropagation(); nextFeatured(); }}>&gt;</button>
-      </div>
+      ) : (
+        !loading && <div className="empty-featured">No hay streams en vivo ahora mismo.</div>
+      )}
 
-      {/* Secciones */}
-      <div className="mini-section">
-        <h3 className="section-title">Recomendados</h3>
-        <div className="mini-streams">{renderMiniStreams(recomendados)}</div>
-      </div>
+      {recomendados.length > 0 && (
+        <>
+          <div className="mini-section">
+            <h3 className="section-title">Recomendados</h3>
+            <div className="mini-streams">{renderMiniStreams(recomendados)}</div>
+          </div>
+          <hr className="section-divider" />
+        </>
+      )}
 
-      <hr className="section-divider" />
+      {conversando.length > 0 && (
+        <>
+          <div className="mini-section">
+            <h3 className="section-title">Conversando</h3>
+            <div className="mini-streams">{renderMiniStreams(conversando)}</div>
+          </div>
+          <hr className="section-divider" />
+        </>
+      )}
 
-      <div className="mini-section">
-        <h3 className="section-title">Conversando</h3>
-        <div className="mini-streams">{renderMiniStreams(conversando)}</div>
-      </div>
-
-      <hr className="section-divider" />
-
-      <div className="mini-section">
-        <h3 className="section-title">Juegos</h3>
-        <div className="mini-streams">{renderMiniStreams(juegos)}</div>
-      </div>
+      {juegos.length > 0 && (
+        <div className="mini-section">
+          <h3 className="section-title">Juegos</h3>
+          <div className="mini-streams">{renderMiniStreams(juegos)}</div>
+        </div>
+      )}
     </div>
   );
 };

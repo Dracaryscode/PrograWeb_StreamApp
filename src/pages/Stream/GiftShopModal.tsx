@@ -1,27 +1,26 @@
-import { useMemo } from 'react'
-import styles from './GiftShopModal.module.css'
+import { useMemo } from "react";
+import styles from "./GiftShopModal.module.css";
 
-export type Gift = {
-  id: string
-  name: string
-  price: number  
-  emoji: string 
-}
+export type GiftUI = {
+  id: number;
+  nombre: string;
+  costo_coins: number;
+  puntos_otorgados: number;
+  emoji?: string;
+};
 
 type Props = {
-  open: boolean
-  balance: number
-  gifts: Gift[]
-  onClose: () => void
-  onSend: (gift: Gift) => void
-  onGetKpoints?: () => void
-}
+  open: boolean;
+  balance: number;
+  gifts: GiftUI[];
+  onClose: () => void;
+  onSend: (gift: GiftUI) => void;
+  onGetKpoints?: () => void;
+};
 
-export default function GiftShopModal({
-  open, balance, gifts, onClose, onSend, onGetKpoints
-}: Props) {
-  const basic = useMemo(() => gifts.slice(0, 6), [gifts])
-  if (!open) return null
+export default function GiftShopModal({ open, balance, gifts, onClose, onSend, onGetKpoints }: Props) {
+  const basic = useMemo(() => gifts.slice(0, 6), [gifts]);
+  if (!open) return null;
 
   return (
     <div className={styles.backdrop} role="dialog" aria-modal="true" aria-label="Tienda de K Puntos">
@@ -36,21 +35,21 @@ export default function GiftShopModal({
           <button className={styles.getKpoints} onClick={onGetKpoints}>Obtener L Puntos</button>
         </div>
 
-        <div className={styles.sectionTitle}>Regalos Basicos</div>
+        <div className={styles.sectionTitle}>Regalos Básicos</div>
 
         <div className={styles.grid}>
-          {basic.map(g => (
+          {basic.map((g) => (
             <button
               key={g.id}
               className={styles.giftCard}
               onClick={() => onSend(g)}
-              title={`Send ${g.name}`}
+              title={`Send ${g.nombre}`}
             >
-              <div className={styles.giftEmoji}>{g.emoji}</div>
-              <div className={styles.giftName}>{g.name}</div>
+              <div className={styles.giftEmoji}>{g.emoji ?? "🎁"}</div>
+              <div className={styles.giftName}>{g.nombre}</div>
               <div className={styles.priceRow}>
                 <span className={styles.k}>L</span>
-                <span>{g.price}</span>
+                <span>{g.costo_coins}</span>
               </div>
             </button>
           ))}
@@ -62,5 +61,5 @@ export default function GiftShopModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

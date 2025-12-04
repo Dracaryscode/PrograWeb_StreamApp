@@ -1,0 +1,30 @@
+          <div className={viewerStyles.giftRow}>
+            <select
+              className={viewerStyles.select}
+              value={selectedGift ?? ""}
+              onChange={(e) => setSelectedGift(Number(e.target.value))}
+            >
+              <option value="">Enviar regalo</option>
+              {gifts.map((g) => (
+                <option key={g.id} value={g.id}>{g.nombre} ({g.costo_coins} coins, {g.puntos_otorgados} pts)</option>
+              ))}
+            </select>
+            <button
+              className={viewerStyles.btnSubtle}
+              onClick={async () => {
+                if (!streamId || !viewerId || !selectedGift) return;
+                try {
+                  const resp = await api.enviarRegalo(streamId, selectedGift, { viewerId, cantidad: 1 }, tokens?.accessToken);
+                  setOverlayMsg("Regalo enviado");
+                  await refresh();
+                  if (resp?.leveled_up) setOverlayMsg("¡Subiste de nivel!");
+                } catch {
+                  setOverlayMsg("Error al enviar regalo");
+                }
+              }}
+              disabled={!streamId || !viewerId || !selectedGift}
+            >
+              <FaGift /> Enviar
+            </button>
+          </div>
+          <div className={viewerStyles.inputRow}>

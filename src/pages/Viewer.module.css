@@ -1,0 +1,393 @@
+.viewerGrid {
+  display: grid;
+  grid-template-columns: 3fr 1.1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .viewerGrid {
+    grid-template-columns: 1fr;
+  }
+  .chatColumn {
+    order: -1;
+  }
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.streamHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #111019;
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid #9f64ff;
+  object-fit: cover;
+}
+
+.title {
+  margin: 0;
+  color: #fff;
+  font-size: 1.3rem;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.livePill {
+  background: #ff2a6a;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.actionBtn {
+  border: 1px solid #333;
+  background: #181825;
+  color: #e6dff7;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.playerWrapper {
+  background: #0b0b12;
+  border-radius: 16px;
+  padding: 6px;
+}
+
+.playerInner {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+  padding-top: 56.25%;
+}
+
+.playerInner iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab, .tabActive {
+  border: 1px solid #333;
+  background: #131421;
+  color: #cfcde6;
+  border-radius: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.tabActive {
+  background: #9f64ff;
+  color: white;
+}
+
+.aboutCard {
+  background: #101018;
+  border-radius: 14px;
+  padding: 12px;
+  color: #e6dff7;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+.eventsList {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.eventItem {
+  background: #151529;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.eventUser {
+  color: #ffb347;
+  font-weight: bold;
+  margin-right: 6px;
+}
+
+.eventGift {
+  color: #a381f9;
+  font-weight: bold;
+}
+
+.eventCoins {
+  margin-left: 6px;
+  color: #aaa;
+}
+
+.chatColumn {
+  background: #0f0f18;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chatHidden {
+  display: none;
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btnSubtle {
+  border: 1px solid #333;
+  background: #161626;
+  color: #dcdcdc;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.messages {
+  flex: 1;
+  overflow: auto;
+  display: grid;
+  gap: 6px;
+  background: #0b0b12;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.chatLine {
+  background: #141424;
+  padding: 6px 8px;
+  border-radius: 10px;
+  color: #dcdcdc;
+}
+
+.username {
+  color: #9f64ff;
+  font-weight: bold;
+  margin-right: 6px;
+}
+
+.text {
+  color: #eee;
+}
+
+.badge {
+  color: #888;
+  font-size: 0.8rem;
+  margin-right: 6px;
+}
+
+.inputRow {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  border: 1px solid #333;
+  background: #0b0b12;
+  color: white;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.send {
+  background: #9f64ff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.errorText {
+  color: #f87171;
+}
+
+.giftBar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  background: linear-gradient(120deg, #141427, #0f0f1b);
+  border: 1px solid #24243c;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.giftSummary {
+  display: flex;
+  flex-direction: column;
+  color: #c8c5ff;
+  gap: 4px;
+}
+
+.giftSummary strong {
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.giftActions {
+  display: flex;
+  gap: 8px;
+}
+
+.openGiftBtn {
+  border: 1px solid #3b2f6a;
+  background: #18152a;
+  color: #e6dff7;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.openGiftBtn:hover {
+  border-color: #9f64ff;
+  background: #211b3a;
+}
+
+.toast {
+  background: #222134;
+  color: #e6dff7;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  animation: fadeout 2s forwards;
+}
+
+@keyframes fadeout {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 6, 12, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: #0f0f1c;
+  border: 1px solid #262542;
+  border-radius: 14px;
+  padding: 14px;
+  width: min(520px, 90vw);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.closeBtn {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ccc;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.giftGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.giftCard {
+  background: #151529;
+  border: 1px solid #24243c;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: left;
+  color: #e6dff7;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.giftCard:hover {
+  border-color: #9f64ff;
+  transform: translateY(-2px);
+}
+
+.giftCardActive {
+  border-color: #9f64ff;
+  box-shadow: 0 6px 20px rgba(159, 100, 255, 0.3);
+}
+
+.giftName {
+  font-weight: 700;
+  color: #fff;
+}
+
+.giftMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #c0bfdc;
+  margin-top: 4px;
+}
+
+.emptyGifts {
+  color: #a9a7c5;
+  grid-column: 1 / -1;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid #24243c;
+  padding-top: 10px;
+}

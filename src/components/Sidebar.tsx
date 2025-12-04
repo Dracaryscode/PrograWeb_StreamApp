@@ -4,13 +4,7 @@ import inicio from "../assets/inicio.png";
 import nosotros from "../assets/nosotros.png";
 import tienda from "../assets/tienda.png";
 import terminos from "../assets/terminos.png";
-import perfilImg from "../assets/perfil.jpg";
 import "./Sidebar.css";
-
-const recommendations = [
-  { id: 1, name: "Canal 1", img: perfilImg, live: true },
-  { id: 2, name: "Canal 2", img: perfilImg, live: false },
-];
 
 interface SidebarProps {
   user: any;
@@ -33,7 +27,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
           <span>Perfil</span>
         </li>
 
-        {/* Mostrar Tienda solo si es usuario */}
         {user?.role !== "streamer" && (
           <li onClick={() => goTo("/tienda")}>
             <img src={tienda} alt="tienda" />
@@ -42,9 +35,14 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         )}
         {user?.role === "streamer" && (
           <li onClick={() => goTo("/gifts")}>
-            {/* Puedes reusar la imagen de tienda o importar una nueva */}
             <img src={tienda} alt="regalos" /> 
             <span>Regalos</span>
+          </li>
+        )}
+        {user?.role === "streamer" && (
+          <li onClick={() => goTo("/stream-setup")}>
+            <img src={tienda} alt="stream" />
+            <span>Configurar Stream</span>
           </li>
         )}
 
@@ -59,10 +57,10 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
 
         {user && (
           <li
-            onClick={onLogout}
+            onClick={() => { onLogout(); goTo("/"); }}
             style={{ marginTop: "20px", cursor: "pointer", color: "#ff5757", fontWeight: "bold" }}
           >
-            🚪 Cerrar sesión
+            Cerrar sesión
           </li>
         )}
       </ul>
@@ -71,13 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
 
       <div className="recommendations">
         <h4>Recomendaciones</h4>
-        {recommendations.map((rec) => (
-          <div key={rec.id} className="recommendation-item">
-            <img src={rec.img} alt={rec.name} />
-            <span className="mini-stream-name">{rec.name}</span>
-            {rec.live && <span className="live-circle"></span>}
-          </div>
-        ))}
+        <p className="mini-stream-name">Se cargarán desde el backend.</p>
       </div>
     </aside>
   );

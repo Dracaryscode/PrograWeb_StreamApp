@@ -18,6 +18,8 @@ import Gifts from "./pages/Gifts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import StreamPage from "./pages/Stream/StreamPage";
+import StreamSetup from "./pages/StreamSetup";
+import StreamViewer from "./pages/StreamViewer";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -32,6 +34,43 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="tienda" element={<Tienda />} />
             <Route path="perfil" element={<Perfil />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="stream-setup" element={
+              <RequireRole role="streamer">
+                <StreamSetup />
+              </RequireRole>
+            } />
+            <Route path="watch/:room" element={<StreamViewer />} />
+            <Route path="feed" element={<Feed />} />
+            <Route
+              path="gifts"
+              element={
+                <RequireRole role="streamer">
+                  <Gifts />
+                </RequireRole>
+              }
+            />
+          </Route>
+          <Route path="/login" element={<App />} >
+            <Route index element={<Login />} />
+          </Route>
+          <Route path="/register" element={<App />} >
+            <Route index element={<Register />} />
+          </Route>
+          <Route element={<App />}>
+            <Route index element={<Home />} />
+            <Route path="nosotros" element={<Nosotros />} />
+            <Route path="tyc" element={<TyC />} />
+            <Route path="tienda" element={<Tienda />} />
+            <Route path="perfil" element={<Perfil />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route
+              path="stream-setup"
+              element={
+                <RequireRole role="streamer">
+                  <StreamSetup />
+                </RequireRole>
+              }
+            />
             <Route path="feed" element={<Feed />} />
             <Route
               path="gifts"

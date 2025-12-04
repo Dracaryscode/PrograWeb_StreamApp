@@ -1,11 +1,10 @@
-// src/components/GiftAlert.tsx
-import { useEffect } from 'react';
-import styles from './GiftAlert.module.css';
-import type { Gift } from '../pages/Stream/GiftShopModal';
+import { useEffect } from "react";
+import styles from "./GiftAlert.module.css";
+import type { GiftUI } from "../pages/Stream/GiftShopModal";
 
 interface GiftAlertProps {
   user: string;
-  gift: Gift;
+  gift: GiftUI;
   onDone: () => void;
 }
 
@@ -20,12 +19,12 @@ const GiftAlert: React.FC<GiftAlertProps> = ({ user, gift, onDone }) => {
       <div className={styles.confetti}></div>
       <div className={styles.confetti}></div>
       <div className={styles.confetti}></div>
-      <div className={styles.giftEmoji}>{gift.emoji}</div>
+      <div className={styles.giftEmoji}>{gift.emoji ?? "🎁"}</div>
       <div className={styles.textContainer}>
         <span className={styles.user}>{user}</span>
         <span className={styles.action}>ha enviado un regalo:</span>
       </div>
-      <div className={styles.giftName}>{gift.name}</div>
+      <div className={styles.giftName}>{gift.nombre}</div>
     </div>
   );
 };
